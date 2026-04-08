@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+# Shebang needed this time to find the interpreter!
+
+import requests
+import argparse
+import os
+import time
+
+url = "http://{hostname}/json"
+
+parser = argparse.ArgumentParser("agent_watterott_co2_special")
+parser.add_argument(
+    "--host",
+    help="Specify the host name or IP address to query.",
+    type=str,
+    default="127.0.0.1")
+parser.add_argument(
+    "--file",
+    help="Specify a file to read instead.",
+    type=str,
+    default="")
+parser.add_argument(
+    "--maxage",
+    help="Specify the maximum allowed age of this file (seconds).",
+    type=float,
+    default=0.0)
+parser.add_argument(
+    "--piggyback",
+    help="Wrap in a piggyback section using the hostname supplied here.",
+    type=str,
+    default="")
+args = parser.parse_args()
+
+if args.file:
+    fpath = args.file
+    fpath = os.path.realpath(fpath)
+    fmtime = os.path.getmtime(fpath)
+    now = time.time()
+    if (now - fmtime < args.maxage):
+        f = open(args.file, 'r')
+        print('<<<watterott_co2_special>>>')
+        for line in f:
+            print(line, end='')
+        f.close
+        print("\n")
+else:
+    response = requests.get(url.format(hostname=args.host))
+    print('<<<watterott_co2_special>>>')
+    print(response.json())
+    print("\n")
