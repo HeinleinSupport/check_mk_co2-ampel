@@ -5,46 +5,81 @@ import requests
 import argparse
 import os
 import time
+import json
 
-url = "http://{hostname}/json"
-
-parser = argparse.ArgumentParser("agent_watterott_co2_special")
-parser.add_argument(
-    "--host",
-    help="Specify the host name or IP address to query.",
-    type=str,
-    default="127.0.0.1")
-parser.add_argument(
-    "--file",
-    help="Specify a file to read instead.",
-    type=str,
-    default="")
-parser.add_argument(
-    "--maxage",
-    help="Specify the maximum allowed age of this file (seconds).",
-    type=float,
-    default=0.0)
-parser.add_argument(
-    "--piggyback",
-    help="Wrap in a piggyback section using the hostname supplied here.",
-    type=str,
-    default="")
-args = parser.parse_args()
-
-if args.file:
-    fpath = args.file
-    fpath = os.path.realpath(fpath)
+def get_config_cli(config):
+    parser = argparse.ArgumentParser("agent_watterott_co2_special")
+    parser.add_argument(
+        "--host",
+        help="Specify the host name or IP address to query.",
+        type=str
+    )
+    parser.add_argument(
+        "--file",
+        help="Specify a file to read instead.",
+        type=str
+    )
+    parser.add_argument(
+        "--maxage",
+        help="Specify the maximum allowed age of this file (seconds).",
+        type=float
+    )
+    parser.add_argument(
+        "--piggyback",
+        help="Wrap in a piggyback section using the hostname supplied here.",
+        type=str
+    )
+    args = parser.parse_args()
+    if args.host:
+        config["host"] = args.host
+    if args.file:
+        config["file"] = args.file
+    if args.maxage:
+        config["maxage"] = args.maxage
+    if args.piggyback:
+        config["piggyback"] = args.piggyback
+    return config
+    
+def get_config():
+    config = {}
+    if "MK_CONFDIR" in os.environ:
+        cfgfile = os.environ["MK_CONFDIR"] + "/watterott_co2.json"
+        if os.path.exists(cfgfile):
+            with open(cfgfile) as f:
+                config = json.load(f)
+    return get_config_cli(config)
+    
+def dump_from_file():
+    fpath = os.path.realpath(config["file"])
     fmtime = os.path.getmtime(fpath)
     now = time.time()
     if (now - fmtime < args.maxage):
+        if "piggyback" in config:
+            sect_start = "<<<<" + config["piggyback"] + ">>>>"
+            print(sect_start)
         f = open(args.file, 'r')
         print('<<<watterott_co2_special>>>')
         for line in f:
             print(line, end='')
         f.close
-        print("\n")
-else:
-    response = requests.get(url.format(hostname=args.host))
+        print("")
+        if "piggyback" in config:
+            print("<<<<>>>>")
+    
+def dump_from_http():
+    url = "http://{hostname}/json"
+    response = requests.get(url.format(hostname=config["host"]))
+    if "piggyback" in config:
+        sect_start = "<<<<" + config["piggyback"] + ">>>>"
+        print(sect_start)
     print('<<<watterott_co2_special>>>')
-    print(response.json())
-    print("\n")
+    print(response.text)
+    print()
+    if "piggyback" in config:
+            print("<<<<>>>>")
+
+config = get_config()
+if "file" in config:
+    dump_from_file()
+else:
+    dump_from_http()
