@@ -13,6 +13,14 @@ def discover_watterott_co2_co2(section):
     yield Service()
     
 def check_watterott_co2_co2(params, section):
+    yield from check_levels(
+        section["c"],
+        levels_upper=params["upper"],
+        metric_name="parts_per_million",
+        label="CO₂ sensor value",
+        render_func=lambda v: "%d ppm" % v,
+    )
+    return
     if section["c"] > 1400.0:
         yield Result(
             state=State(State.CRIT),
@@ -90,13 +98,11 @@ check_plugin_watterott_co2_co2 = CheckPlugin(
     service_name = "CO₂ concentration Watterott sensor",
     discovery_function = discover_watterott_co2_co2,
     check_function = check_watterott_co2_co2,
-    check_default_parameters = {},
-    #check_default_parameters = { 
-    #    "stateregular": int(State.WARN), 
-    #    "statesecurity": int(State.CRIT), 
-    #    "statereboot": int(State.CRIT) 
-    #},
-    #check_ruleset_name = "watterott_co2_special_co2",
+    check_default_parameters = {
+        "upper": ("fixed", (800, 1200)),
+        "hysteresis": 100,
+    },
+    check_ruleset_name = "watterott_co2_special_co2",
 )
 
 check_plugin_watterott_co2_temp = CheckPlugin(
@@ -124,4 +130,3 @@ check_plugin_watterott_co2_humidity = CheckPlugin(
     },
     check_ruleset_name = "watterott_co2_special_humidity",
 )
-
