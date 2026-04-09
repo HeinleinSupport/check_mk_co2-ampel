@@ -1,0 +1,54 @@
+// encoding: utf-8
+= Checkmk integration for Watterott CO₂ sensor boards
+
+This repository contains an link:https://github.com/checkmk/checkmk[Checkmk^] special agent and agent plugin to access the link:https://learn.watterott.com/breakouts/co2-ampel/[Watterott CO₂-Ampel^].
+
+Unlike earlier attempts this extension uses a special agent approach accessing the JSON endpoint for added flexibility.
+
+== Compatibility
+
+Currently, Checkmk versions 2.3.0 to 2.5.0 are supported.
+
+== Installation
+
+=== Normal users
+
+////
+Download the MKP from the _Releases_ section (when it becomes available) and install as described in the link:https://docs.checkmk.com/latest/en/mkps.html[Official Checkmk User Guide].
+////
+
+I will build MKPs from time to time when a rather stable state is reached and all components play well with each other.
+Install it as described in the link:https://docs.checkmk.com/latest/en/mkps.html[Official Checkmk User Guide].
+
+=== Developers
+
+Clone this repository, then sync the content of `_omd_root` to the root directory of your Checkmk site.
+Then restart the site with `omd restart`.
+After updating, it might be necessary to remove outdated `.pyc` files between stopping and starting the site.
+
+== Configuration
+
+The agent data currently can be transferred in three different ways:
+
+* Via a typical special agent that accesses the sensor board via HTTP
+* Via a special agent configuration that reads a file from the filesystem – made for people who do things like `wget -O - http://198.51.100.23/json | ssh me@cmkserver 'cat > /tmp/co2.txt'`
+* Via an agent plug-in: the special agent can be deployed as agent plug-in to query a sensor board in the same network
+
+=== Deployment of the special agent as agent plug-in
+
+Imagine this situation:
+You are running a few regular hosts in a NAT'ed network but also have a Watterott CO₂-Ampel in this network.
+Since you are using Checkmk Ultimate in free tier, you can use the push agent.
+But your CO₂-Ampels JSON endpoint is unavailable to the Checkmk server.
+
+To solve this, you can deploy the special agent `agent_watterott_co2_special` as `/usr/lib/check_mk_agent/plugins/watterott.py` on any monitored host.
+If the environment variable `MK_CONFDIR` is present, it will search for it's config file and does not need CLI options.
+Create that config file:
+
+./etc/check_mk/watterott_co2.json
+[source,json]
+----
+{ "host": "198.51.100.42", "piggyback": "some-host-name" }
+----
+
+If you omit the `piggyback` key-value pair, the agent section will not be wrapped in a piggyback section and thus services will appear for the host that transfers the agent data instead of `some-host-name`.
