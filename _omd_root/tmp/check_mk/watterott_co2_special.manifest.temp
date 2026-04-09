@@ -1,6 +1,6 @@
 {'author': 'Mattias Schlenker',
  'description': 'Special agent and related configuration and check plug-ins for air quality monitoring with the Watterott CO₂ Ampel.',
- 'download_url': 'https://example.com/watterott_co2_special/',
+ 'download_url': 'https://github.com/mschlenker/checkmk-extension-co2-ampel-special',
  'files': {'cmk_addons_plugins': ['watterott_co2_special/agent_based/watterott_co2_air_quality_checks.py',
                                   'watterott_co2_special/libexec/agent_watterott_co2_special',
                                   'watterott_co2_special/rulesets/ruleset_check_plugins.py',
@@ -8,7 +8,7 @@
                                   'watterott_co2_special/server_side_calls/special_agent_watterott_co2.py']},
  'name': 'watterott_co2_special',
  'title': 'Watterott CO₂ monitoring (special agent)',
- 'version': '0.4.0',
+ 'version': '0.4.1',
  'version.min_required': '2.3.0p1',
  'version.packaged': 'cmk-mkp-tool 1.0.0',
  'version.usable_until': '2.5.99'}
