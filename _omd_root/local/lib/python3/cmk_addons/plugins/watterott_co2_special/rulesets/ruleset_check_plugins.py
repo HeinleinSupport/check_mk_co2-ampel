@@ -2,12 +2,12 @@
 
 from cmk.rulesets.v1 import Label, Title, Help
 from cmk.rulesets.v1.form_specs import Percentage, BooleanChoice, DefaultValue, DictElement, Dictionary, Float, Integer, LevelDirection, SimpleLevels
-from cmk.rulesets.v1.rule_specs import CheckParameters, HostAndItemCondition, Topic
+from cmk.rulesets.v1.rule_specs import CheckParameters, HostCondition, Topic
 
 def parameter_form_watterott_co2_humidity():
     return Dictionary(
         elements = {
-            "humidity_lower": DictElement(
+            "lower": DictElement(
                 parameter_form = SimpleLevels(
                     title = Title("Lower relative humidity threshold"),
                     form_spec_template = Percentage(),
@@ -16,7 +16,7 @@ def parameter_form_watterott_co2_humidity():
                 ),
                 required = True,
             ),
-            "humidity_upper": DictElement(
+            "upper": DictElement(
                 parameter_form = SimpleLevels(
                     title = Title("Upper relative humidity threshold"),
                     form_spec_template = Percentage(),
@@ -31,7 +31,7 @@ def parameter_form_watterott_co2_humidity():
 def parameter_form_watterott_co2_temperature():
     return Dictionary(
         elements = {
-            "humidity_lower": DictElement(
+            "lower": DictElement(
                 parameter_form = SimpleLevels(
                     title = Title("Lower temperature threshold"),
                     form_spec_template = Float(),
@@ -40,7 +40,7 @@ def parameter_form_watterott_co2_temperature():
                 ),
                 required = True,
             ),
-            "humidity_upper": DictElement(
+            "upper": DictElement(
                 parameter_form = SimpleLevels(
                     title = Title("Upper temperature threshold"),
                     form_spec_template = Float(),
@@ -55,7 +55,7 @@ def parameter_form_watterott_co2_temperature():
 def parameter_form_watterott_co2_co2():
     return Dictionary(
         elements = {
-            "co2_upper": DictElement(
+            "upper": DictElement(
                 parameter_form = SimpleLevels(
                     title = Title("CO₂ concentration thresholds"),
                     form_spec_template = Integer(),
@@ -81,7 +81,7 @@ rule_spec_watterott_co2_special_humidity = CheckParameters(
     title = Title("Humidity levels for Watterott CO₂ sensor"),
     topic = Topic.ENVIRONMENTAL,
     parameter_form = parameter_form_watterott_co2_humidity,
-    condition = HostAndItemCondition(item_title=Title("Humidity Watterott sensor")),
+    condition = HostCondition(),
 )
 
 rule_spec_watterott_co2_special_temp = CheckParameters(
@@ -89,7 +89,7 @@ rule_spec_watterott_co2_special_temp = CheckParameters(
     title = Title("Temperature levels for Watterott CO₂ sensor"),
     topic = Topic.ENVIRONMENTAL,
     parameter_form = parameter_form_watterott_co2_temperature,
-    condition = HostAndItemCondition(item_title=Title("Temperature Watterott sensor")),
+    condition = HostCondition(),
 )
 
 rule_spec_watterott_co2_special_co2 = CheckParameters(
@@ -97,5 +97,5 @@ rule_spec_watterott_co2_special_co2 = CheckParameters(
     title = Title("CO₂ concentration levels for Watterott CO₂ sensor"),
     topic = Topic.ENVIRONMENTAL,
     parameter_form = parameter_form_watterott_co2_co2,
-    condition = HostAndItemCondition(item_title=Title("CO₂ concentration Watterott sensor")),
+    condition = HostCondition(),
 )

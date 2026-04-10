@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from cmk.agent_based.v2 import AgentSection, CheckPlugin, Service, Result, State, Metric, check_levels
+from cmk.agent_based.v2 import AgentSection, CheckPlugin, Service, check_levels
 import itertools
 import json
 
@@ -20,30 +20,10 @@ def check_watterott_co2_co2(params, section):
         label="CO₂ sensor value",
         render_func=lambda v: "%d ppm" % v,
     )
-    return
-    if section["c"] > 1400.0:
-        yield Result(
-            state=State(State.CRIT),
-            summary="You are dead soon!",
-        )
-    elif section["c"] > 800.0:
-         yield Result(
-            state=State(State.WARN),
-            summary="Ventilate if you do not want to be dead soon.",
-        )
-    else:
-         yield Result(
-            state=State(State.OK),
-            summary="Everything is fine.",
-        )
-    yield Metric(
-        name = "parts_per_million",
-        value = section["c"],
-    )
 
 def discover_watterott_co2_temp(section):
     yield Service()
-    
+
 def check_watterott_co2_temp(params, section):
     yield from check_levels(
         section["t"],
@@ -53,27 +33,7 @@ def check_watterott_co2_temp(params, section):
         label="Temperature sensor value",
         render_func=lambda v: "%.1f°C" % v,
     )
-    return
-    if section["t"] > 24.0:
-        yield Result(
-            state=State(State.CRIT),
-            summary="You are grilled soon!",
-        )
-    elif section["t"] > 22.0:
-         yield Result(
-            state=State(State.WARN),
-            summary="Shade if you do not want to be grilled soon.",
-        )
-    else:
-         yield Result(
-            state=State(State.OK),
-            summary="Everything is fine.",
-        )
-    yield Metric(
-        name = "temp",
-        value = section["t"],
-    )
-    
+
 def discover_watterott_co2_humidity(section):
     yield Service()
     
